@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    
+
+    <title>Document</title>
+<style>
+  #cc{
+    margin-top: 50px;
+  }
+  #msgArea{
+    display: none;
+  }
+</style>
+</head>
+<body id='cc'>
+   
+<div class='container'>
+  <div id='userFormArea' class="row">
+    <div class="col-md-4">
+        <form id='userform'>
+            <div class='form-group'>
+              <label>Enter Username</label>
+              <input  class="form-control" id='username'></textarea>
+            <br>
+            <input type='button' class='btn btn-primary' value='Enter Chat Room!'/>
+            </div>
+          </form>
+          
+  </div>
+  <div id='msgArea' class="row">
+    <div class="col-md-4">
+<div class='well'>
+  <h3>Online Users</h3>
+  <ul class='list-group' id='users'></ul>
+</div>
+    </div>
+    <div class='col-md-8'>
+<div class='chat' id='chat'>
+
+</div>
+<form id='msgform'>
+  <div class='form-group'>
+    <label>Enter Message</label>
+    <textarea class="form-control" id='message'></textarea>
+  <br>
+  <button type='submit' class='btn btn-primary'>Send Message</button>
+  </div>
+</form>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+  
+
+      <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+      <script src='/socket.io/socket.io.js'></script>
+
+<script>
+$(function(){
+  var socket=io.connect();
+  var $msgForm=$('#msgform');
+  var $message=$('#message');
+  var $chat=$('#chat');
+
+  var $userform=$('#userform');
+  var $userFormArea=$('#userFormArea');
+  var $msgArea=$('#msgArea');
+  var $username=$('#username');
+  var $users=$('#users');
+
+  $msgForm.submit(function(e){
+    e.preventDefault();
+    // console.log('submitted');
+    socket.emit('send message',$message.val()); 
+    $message.val('');
+
+  });
+
+  socket.on('new message',function(data){
+    $chat.append("<div class='well'>"+data.msg+"</div>")
+  })
+
+  
+  $userform.submit(function(e){
+    e.preventDefault();
+    // console.log('submitted');
+    socket.emit('new user',$username.val(),function(data){
+      if(data){
+        $userFormArea.hide();
+        $msgArea.show();
+      }
+    }); 
+    $username.val('');
+
+  });
+
+  socket.on('get users',function(data){
+    var html='';
+    for( i=0;i<data.length;i++){
+      html+='<li class="list-group-item">'+data[i]+'</li>';
+    }
+    $users.html(html);
+  });
+});
+
+</script>
+</body>
+</html>
