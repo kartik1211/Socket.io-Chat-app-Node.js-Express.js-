@@ -6,7 +6,7 @@ users=[];
 connections=[];
 
 server.listen(3000);
-console.log('Connected!');
+console.log('Its Connected!');
 app.get('/',function(req,res){
   res.sendFile(__dirname+'/public/index.html');
 })
